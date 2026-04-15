@@ -240,27 +240,21 @@ function showNotification(message, type = 'info') {
 function initScrollAnimations() {
     const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        rootMargin: '0px 0px -100px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+                entry.target.classList.add('visible');
             }
         });
     }, observerOptions);
 
-    // Observe elements (add more selectors as needed)
-    const elementsToAnimate = document.querySelectorAll('.hero-content, .hero-image');
+    // Observe all fade-in elements
+    const elementsToAnimate = document.querySelectorAll('.fade-in-element');
 
     elementsToAnimate.forEach(element => {
-        // Initial state
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(30px)';
-        element.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
-
         observer.observe(element);
     });
 }
@@ -387,6 +381,215 @@ function initLazyLoading() {
 }
 
 // ========================================
+// PRICING PLAN INTERACTIONS
+// ========================================
+
+/**
+ * Handle pricing plan interactions
+ */
+function initPricingInteractions() {
+    const pricingButtons = document.querySelectorAll('.pricing-card .btn');
+
+    pricingButtons.forEach((btn, index) => {
+        btn.addEventListener('click', () => {
+            const planType = index === 0 ? 'Monthly' : 'Annual';
+            console.log(`${planType} plan selected`);
+            showNotification(`${planType} plan selected! Redirecting to checkout...`, 'success');
+        });
+    });
+}
+
+// ========================================
+// RECIPE BROWSE INTERACTION
+// ========================================
+
+/**
+ * Handle recipe browse button
+ */
+function initRecipeButton() {
+    const recipeBrowseBtn = document.querySelector('.cook-section .btn-primary');
+
+    if (recipeBrowseBtn) {
+        recipeBrowseBtn.addEventListener('click', () => {
+            console.log('Browse Recipes clicked');
+            showNotification('Recipe directory coming soon! 🍳', 'info');
+        });
+    }
+}
+
+// ========================================
+// DIETARY TAG INTERACTIONS
+// ========================================
+
+/**
+ * Handle dietary tag selection
+ */
+function initDietaryTags() {
+    const dietaryTags = document.querySelectorAll('.dietary-tag');
+
+    dietaryTags.forEach(tag => {
+        tag.addEventListener('click', () => {
+            const tagName = tag.textContent;
+            console.log(`Dietary filter selected: ${tagName}`);
+
+            // Toggle active state
+            tag.classList.toggle('active');
+
+            // Show notification
+            if (tag.classList.contains('active')) {
+                showNotification(`Filtering by ${tagName}`, 'info');
+            }
+        });
+    });
+}
+
+// ========================================
+// MEAL CARD INTERACTIONS
+// ========================================
+
+/**
+ * Handle meal card clicks
+ */
+function initMealCards() {
+    const mealCards = document.querySelectorAll('.meal-card');
+
+    mealCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const mealTitle = card.querySelector('.meal-title').textContent;
+            console.log(`Meal selected: ${mealTitle}`);
+            showNotification(`${mealTitle} details coming soon!`, 'info');
+        });
+
+        // Add keyboard support
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
+
+        card.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                card.click();
+            }
+        });
+    });
+}
+
+// ========================================
+// GALLERY IMAGE LIGHTBOX (Simple version)
+// ========================================
+
+/**
+ * Handle gallery image clicks
+ */
+function initGallery() {
+    const galleryItems = document.querySelectorAll('.gallery-item');
+
+    galleryItems.forEach((item, index) => {
+        item.addEventListener('click', () => {
+            console.log(`Gallery image ${index + 1} clicked`);
+            // In a production app, this would open a lightbox
+            showNotification('Image viewer coming soon!', 'info');
+        });
+
+        // Add keyboard support
+        item.setAttribute('tabindex', '0');
+        item.setAttribute('role', 'button');
+
+        item.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                item.click();
+            }
+        });
+    });
+}
+
+// ========================================
+// FOOTER LINK TRACKING
+// ========================================
+
+/**
+ * Track footer link clicks
+ */
+function initFooterTracking() {
+    const footerLinks = document.querySelectorAll('.footer-list a');
+
+    footerLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const linkText = link.textContent;
+            console.log(`Footer link clicked: ${linkText}`);
+
+            // For demo purposes, prevent default and show notification
+            if (link.getAttribute('href') === '#') {
+                e.preventDefault();
+                showNotification(`${linkText} page coming soon!`, 'info');
+            }
+        });
+    });
+}
+
+// ========================================
+// ACTIVE DIETARY TAG STYLING
+// ========================================
+
+/**
+ * Add CSS for active dietary tags
+ */
+function addDietaryTagStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .dietary-tag.active {
+            background-color: var(--primary-purple);
+            color: var(--text-white);
+            border-color: var(--primary-purple);
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// ========================================
+// SCROLL PROGRESS INDICATOR
+// ========================================
+
+/**
+ * Add scroll progress indicator
+ */
+function initScrollProgress() {
+    // Create progress bar element
+    const progressBar = document.createElement('div');
+    progressBar.className = 'scroll-progress';
+    progressBar.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-purple), var(--secondary-orange));
+        z-index: 10000;
+        transition: width 0.1s ease-out;
+    `;
+    document.body.appendChild(progressBar);
+
+    // Update progress on scroll
+    function updateScrollProgress() {
+        const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (window.scrollY / windowHeight) * 100;
+        progressBar.style.width = scrolled + '%';
+    }
+
+    // Throttle scroll events for better performance
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                updateScrollProgress();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+}
+
+// ========================================
 // INITIALIZATION
 // ========================================
 
@@ -402,11 +605,20 @@ function init() {
     initAvatarEffects();
     initKeyboardNavigation();
     initLazyLoading();
+    initPricingInteractions();
+    initRecipeButton();
+    initDietaryTags();
+    initMealCards();
+    initGallery();
+    initFooterTracking();
+    initScrollProgress();
+    addDietaryTagStyles();
 
     // Log initial state
     console.log('Mobile menu:', mobileMenuToggle ? 'Ready' : 'Not found');
     console.log('Navigation links:', navLinks.length);
     console.log('Viewport width:', window.innerWidth);
+    console.log('Sections loaded:', document.querySelectorAll('section').length);
 }
 
 // Run initialization when DOM is fully loaded
@@ -426,6 +638,12 @@ if (typeof module !== 'undefined' && module.exports) {
         toggleMobileMenu,
         showNotification,
         initSmoothScroll,
-        initScrollAnimations
+        initScrollAnimations,
+        initPricingInteractions,
+        initRecipeButton,
+        initDietaryTags,
+        initMealCards,
+        initGallery,
+        initFooterTracking
     };
 }
